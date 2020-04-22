@@ -1,0 +1,78 @@
+<!DOCTYPE>
+<html>
+  <head>
+    <script src="UI/libs/jquery.js" type="text/javascript"></script>
+    <script src="UI/libs/jquery.tmpl.min.js" type="text/javascript"></script>
+    <script src="UI/libs/jquery-ui.min.js" type="text/javascript"></script>
+    <link href="UI/libs/jquery-ui.min.css" rel="stylesheet"></link>
+    
+    <script src="libs/lodash.min.js"></script>
+    <script src='libs/anonymousassertion.js'></script>
+    <script src="kore-bot-sdk-client.js"></script>
+    <script src="UI/chatWindow.js" type="text/javascript"></script>
+    <link href="UI/chatWindow.css" rel="stylesheet"></link>
+    <script type="text/javascript">
+    $(document).on("ready",function(){
+      function assertion(options, callback) {
+
+        // Client has to fill the claims and call the callback.
+        var json_data = {
+          "appId": 'cs-5c55c035-9931-53dc-9f58-451ef801d7ab',
+          "sub": 'saisagar.kache@techwave.net',
+          "aud": "https://idproxy.kore.com/authorize",
+          "isAnonymous": false,
+        }
+        // "iss": 'cs-5c55c035-9931-53dc-9f58-451ef801d7ab'
+        $.ajax({
+          url: "https://westcon-sap-po-status.herokuapp.com/get_token",
+          type: 'post',
+          data: json_data,
+          dataType: 'json',
+          success: function (data) {
+            options.assertion = data.jwt
+            callback(null, options);
+          }
+        })
+      }
+      
+      var botOptions = {};
+      botOptions.koreAPIUrl = "https://bots.kore.ai/api/";
+      botOptions.assertionFn = assertion;
+      botOptions.koreAnonymousFn = koreAnonymousFn;
+      botOptions.botInfo = {"name":"TW_Sysco", "_id" :"st-892003cb-935a-524d-9aec-0395942ac7bd"};
+      botOptions.JWTUrl ="http://localhost:4000/get_token";
+      botOptions.userIdentity = 'saisagar.kache@techwave.net';
+      botOptions.clientId   = "cs-5c55c035-9931-53dc-9f58-451ef801d7ab";
+      botOptions.clientSecret="xqMJ/gcFFJRXb+8UPUPCkU/Yry+IYEDRo8KM8FaLDho=";
+
+       // https://github.com/Koredotcom/web-kore-sdk
+      var chatConfig={
+          botOptions:botOptions,
+          allowIframe : false, // set true, opens authentication links in popup window, default value is "false"
+          isSendButton: false, // set true, to show send button below the compose bar
+          isTTSEnabled: true, // set false, to hide speaker icon
+          isSpeechEnabled: true, // set false, to hide mic icon
+          allowGoogleSpeech : true, //This feature requires valid Google speech API key. (Place it in 'web-kore-sdk/libs/speech/key.js')
+                        //Google speech works in Google Chrome browser without API key.
+          allowLocation : true, // set false, to deny sending location to server
+          loadHistory: false, // set true to load recent chat history
+          messageHistoryLimit: 10, // set limit to load recent chat history
+          autoEnableSpeechAndTTS : false, // set true, to use talkType voice keyboard.
+          // graphLib: "d3"  // set google, to render google charts.This feature requires loader.js file which is available in google charts documentation.
+        // googleMapsAPIKey:'' // please provide google maps API key to fetch user location.
+      };
+
+      koreBotChat().show(chatConfig);
+      $('.openChatWindow').click(function(){
+        koreBotChat().show(chatConfig);
+      });
+    });
+    </script>
+  </head>
+  <body style="margin:0px;padding:0px">
+     <img src="C4CServiceHome.png"/>
+    <div id="chatContainer" style="position: top; position: absolute; top: 0px;">
+    <button class="openChatWindow">Open Chat Window</button>
+    </div>
+  </body>
+</html>
